@@ -1,16 +1,17 @@
-import express from 'express';
-const app = express();
+import app from './app';
+import mongoose from 'mongoose';
+import env from './utils/validateEnv';
 
-const port = 5000;
-
-app.get('/', (req, res) => {
-    res.send('Hello ac');
-});
-
-app.get('/check', (req, res) => {
-    res.send('Check - 123');
-});
-
-app.listen(port, () => {
-    console.log('Server run successfully at http://localhost:5000');
-});
+mongoose
+    .connect(env.MONGODB_URI, { dbName: 'note-app' })
+    .then(() => {
+        console.log('connect database successfully!');
+        app.listen(env.PORT, () => {
+            console.log(
+                `Server run successfully at http://localhost:${env.PORT}`,
+            );
+        });
+    })
+    .catch((error) => {
+        console.error('connect database failure with error:' + error);
+    });
