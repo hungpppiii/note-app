@@ -5,7 +5,7 @@ const router = Router();
 
 router.get('/:id', NoteController.getNote);
 router.get('/', NoteController.getNotes);
-router.post('/create', NoteController.createNote);
+router.post('/', NoteController.createNote);
 router.patch('/:id', NoteController.updateNode);
 router.delete('/:id', NoteController.deleteNote);
 
