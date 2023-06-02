@@ -1,6 +1,10 @@
 import { NextFunction, Request, Response, RequestHandler } from 'express';
 
-export default (fn: RequestHandler): RequestHandler =>
-    (req: Request, res: Response, next: NextFunction): void => {
-        Promise.resolve(fn(req, res, next)).catch(next);
+export default (fn: RequestHandler) =>
+    async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            await fn(req, res, next);
+        } catch (error) {
+            next(error);
+        }
     };

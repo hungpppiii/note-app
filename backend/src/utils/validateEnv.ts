@@ -7,4 +7,5 @@ export default cleanEnv(process.env, {
     NODE_ENV: str({
         choices: ['development', 'test', 'production', 'staging'],
     }),
+    SESSION_SECRET: str(),
 });

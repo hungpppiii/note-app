@@ -30,9 +30,9 @@ interface CreateNoteBody {
     text?: string;
 }
 
-export const createNote: RequestHandler = asyncHandler(
-    async (req, res, next) => {
-        const { title, text }: CreateNoteBody = req.body;
+export const createNote: RequestHandler<any, any, CreateNoteBody, any> =
+    asyncHandler(async (req, res, next) => {
+        const { title, text } = req.body;
 
         if (!title) {
             throw createHttpError(400, 'Note need a title');
@@ -40,14 +40,11 @@ export const createNote: RequestHandler = asyncHandler(
 
         const newNote = await NoteModel.create({ title, text });
 
-        console.log(newNote);
-
         res.status(201).json({ success: true, data: newNote });
-    },
-);
+    });
 
-export const updateNode: RequestHandler = asyncHandler(
-    async (req, res, next) => {
+export const updateNode: RequestHandler<any, any, CreateNoteBody, any> =
+    asyncHandler(async (req, res, next) => {
         const noteId = req.params.id;
         const { title, text } = req.body;
 
@@ -66,13 +63,8 @@ export const updateNode: RequestHandler = asyncHandler(
 
         const updatedNote = await note.save();
 
-        // if (!updatedNote) {
-        //   throw createHttpError('400', '');
-        // }
-
         res.status(201).json({ success: true, data: updatedNote });
-    },
-);
+    });
 
 export const deleteNote: RequestHandler = asyncHandler(
     async (req, res, next) => {

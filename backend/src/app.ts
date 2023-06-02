@@ -3,8 +3,42 @@ import express, { Express } from 'express';
 import errorHandler from './middlewares/errorHandler';
 import morgan from 'morgan';
 import noteRoutes from './routes/notes';
+import userRoutes from './routes/users';
+import RedisStore from 'connect-redis';
+import session from 'express-session';
+import { createClient } from 'redis';
+import createHttpError from 'http-errors';
+import env from './utils/validateEnv';
 
 const app: Express = express();
+
+const redisClient = createClient();
+
+redisClient.connect().catch(console.error);
+
+// Initialize store.
+const redisStore = new RedisStore({
+    client: redisClient,
+    prefix: 'note_app:',
+});
+
+const sessionOptions: session.SessionOptions = {
+    secret: env.SESSION_SECRET,
+    cookie: {
+        maxAge: 60 * 60 * 1000,
+    },
+    saveUninitialized: false,
+    store: redisStore,
+    resave: false,
+    rolling: true,
+};
+
+if (app.get('env') === 'production' && sessionOptions.cookie !== undefined) {
+    app.set('trust proxy', 1); // trust first proxy
+    sessionOptions.cookie.secure = true; // serve secure cookies
+}
+
+app.use(session(sessionOptions));
 
 // parse application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: false }));
@@ -16,7 +50,13 @@ app.use(morgan('combined'));
 
 // config routes
 app.use('/api/notes', noteRoutes);
+app.use('/api/auth', userRoutes);
 
+app.use((req, res, next) => {
+    next(createHttpError(404, 'Endpoint not found'));
+});
+
+// error middleware
 app.use(errorHandler);
 
 export default app;
