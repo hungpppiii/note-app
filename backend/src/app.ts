@@ -4,23 +4,24 @@ import errorHandler from './middlewares/errorHandler';
 import morgan from 'morgan';
 import noteRoutes from './routes/notes';
 import userRoutes from './routes/users';
-import RedisStore from 'connect-redis';
 import session from 'express-session';
+import RedisStore from 'connect-redis';
 import { createClient } from 'redis';
 import createHttpError from 'http-errors';
 import env from './utils/validateEnv';
+import requiresAuth from './middlewares/auth';
 
 const app: Express = express();
 
-const redisClient = createClient();
+// const redisClient = createClient();
 
-redisClient.connect().catch(console.error);
+// redisClient.connect().catch(console.error);
 
-// Initialize store.
-const redisStore = new RedisStore({
-    client: redisClient,
-    prefix: 'note_app:',
-});
+// // Initialize store.
+// const redisStore = new RedisStore({
+//   client: redisClient,
+//   prefix: 'note_app:',
+// });
 
 const sessionOptions: session.SessionOptions = {
     secret: env.SESSION_SECRET,
@@ -28,7 +29,7 @@ const sessionOptions: session.SessionOptions = {
         maxAge: 60 * 60 * 1000,
     },
     saveUninitialized: false,
-    store: redisStore,
+    //   store: redisStore,
     resave: false,
     rolling: true,
 };
@@ -49,12 +50,12 @@ app.use(express.json());
 app.use(morgan('combined'));
 
 // config routes
-app.use('/api/notes', noteRoutes);
+app.use('/api/notes', requiresAuth, noteRoutes);
 app.use('/api/auth', userRoutes);
 
-app.use((req, res, next) => {
-    next(createHttpError(404, 'Endpoint not found'));
-});
+// app.use((req, res, next) => {
+//   next(createHttpError(404, 'Endpoint not found'));
+// });
 
 // error middleware
 app.use(errorHandler);

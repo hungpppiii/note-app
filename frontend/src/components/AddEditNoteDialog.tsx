@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { NoteInput } from '../network/notes_api';
 import * as NoteApi from '../network/notes_api';
 import { Note as NoteModel } from '../models/notes';
+import TextInputField from './form/TextInputField';
 
 interface AddNoteDialogProps {
   noteToEdit?: NoteModel;
@@ -48,34 +49,27 @@ const AddEditNoteDialog = ({
       </Modal.Header>
       <Modal.Body>
         <Form id="addEditNoteForm" onSubmit={handleSubmit(onSubmit)}>
-          <Form.Group className="mb-3" controlId="noteTitle">
-            <Form.Label>Title</Form.Label>
-            <Form.Control
-              type="text"
-              isInvalid={!!errors.title}
-              placeholder="Enter title name"
-              {...register('title', {
-                required: 'This field cannot be left blank',
-              })}
-            />
-            <Form.Control.Feedback type="invalid">
-              {errors.title?.message}
-            </Form.Control.Feedback>
-          </Form.Group>
-          <Form.Group className="mb-3" controlId="noteText">
-            <Form.Label>Text</Form.Label>
-            <Form.Control
-              type="text"
-              as={'textarea'}
-              rows={3}
-              isInvalid={!!errors.text}
-              placeholder="Enter text name"
-              {...register('text')}
-            />
-            <Form.Control.Feedback type="invalid">
-              {errors.text?.message}
-            </Form.Control.Feedback>
-          </Form.Group>
+          <TextInputField
+            name={'title'}
+            label={'Title'}
+            register={register}
+            registerOptions={{
+              required: 'This field cannot be left blank',
+            }}
+            error={errors.title}
+            type="text"
+            placeholder="Enter title name"
+          />
+          <TextInputField
+            name={'text'}
+            label={'Text'}
+            register={register}
+            error={errors.text}
+            type="text"
+            as={'textarea'}
+            rows={3}
+            placeholder="Enter text name"
+          />
         </Form>
       </Modal.Body>
       <Modal.Footer>

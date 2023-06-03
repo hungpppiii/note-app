@@ -15,7 +15,19 @@ export const getAuthenticatedUser: RequestHandler = asyncHandler(
         if (!req.session.userId) {
             throw createHttpError(401, 'User not authenticated');
         }
-        res.sendStatus(200);
+
+        const existsUser = await UserModel.findById(req.session.userId).select(
+            'username email',
+        );
+
+        if (!existsUser) {
+            throw createHttpError(401, 'User not authenticated');
+        }
+
+        res.status(200).json({
+            success: true,
+            data: { username: existsUser.username, email: existsUser.email },
+        });
     },
 );
 
@@ -47,7 +59,12 @@ export const signUp: RequestHandler<any, any, SignUpBody, any> = asyncHandler(
             password: passwordHashed,
         });
 
-        res.status(201).json({ success: true, data: newUser });
+        req.session.userId = newUser._id;
+
+        res.status(201).json({
+            success: true,
+            data: { username: newUser.username, email: newUser.email },
+        });
     },
 );
 
@@ -65,24 +82,24 @@ export const signIn: RequestHandler<any, any, SignInBody, any> = asyncHandler(
         }
 
         const user = await UserModel.findOne({ username }).select(
-            'username password',
+            'username email password',
         );
 
         if (!user) {
-            throw createHttpError(409, 'username not exists');
+            throw createHttpError(401, 'username not exists');
         }
 
         const confirmPassword = await bcrypt.compare(password, user.password);
 
         if (!confirmPassword) {
-            throw createHttpError(409, 'you entered the wrong password');
+            throw createHttpError(401, 'you entered the wrong password');
         }
 
         req.session.userId = user._id;
 
         res.status(200).json({
             success: true,
-            data: { username: user.username },
+            data: { username: user.username, email: user.email },
         });
     },
 );
