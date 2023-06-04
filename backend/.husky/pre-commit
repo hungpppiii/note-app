@@ -4,4 +4,4 @@
 cd backend
 npm run build
 npm run format
-git add dist
+git add .
