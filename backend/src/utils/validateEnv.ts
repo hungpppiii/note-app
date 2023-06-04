@@ -8,4 +8,5 @@ export default cleanEnv(process.env, {
         choices: ['development', 'test', 'production', 'staging'],
     }),
     SESSION_SECRET: str(),
+    REDIS_URL: str(),
 });

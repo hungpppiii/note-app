@@ -13,15 +13,15 @@ import requiresAuth from './middlewares/auth';
 
 const app: Express = express();
 
-// const redisClient = createClient();
+const redisClient = createClient({ url: env.REDIS_URL });
 
-// redisClient.connect().catch(console.error);
+redisClient.connect().catch(console.error);
 
-// // Initialize store.
-// const redisStore = new RedisStore({
-//   client: redisClient,
-//   prefix: 'note_app:',
-// });
+// Initialize store.
+const redisStore = new RedisStore({
+    client: redisClient,
+    prefix: 'note_app:',
+});
 
 const sessionOptions: session.SessionOptions = {
     secret: env.SESSION_SECRET,
@@ -53,9 +53,9 @@ app.use(morgan('combined'));
 app.use('/api/notes', requiresAuth, noteRoutes);
 app.use('/api/auth', userRoutes);
 
-// app.use((req, res, next) => {
-//   next(createHttpError(404, 'Endpoint not found'));
-// });
+app.use((req, res, next) => {
+    next(createHttpError(404, 'Endpoint not found'));
+});
 
 // error middleware
 app.use(errorHandler);
