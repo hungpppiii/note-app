@@ -15,6 +15,7 @@ const redis_1 = require("redis");
 const http_errors_1 = __importDefault(require("http-errors"));
 const validateEnv_1 = __importDefault(require("./utils/validateEnv"));
 const auth_1 = __importDefault(require("./middlewares/auth"));
+const cors_1 = __importDefault(require("cors"));
 const app = (0, express_1.default)();
 const redisClient = (0, redis_1.createClient)({ url: validateEnv_1.default.REDIS_URL });
 redisClient.connect().catch(console.error);
@@ -27,16 +28,19 @@ const sessionOptions = {
     secret: validateEnv_1.default.SESSION_SECRET,
     cookie: {
         maxAge: 60 * 60 * 1000,
+        // cookie same site, comment this line if you are on the same site
+        sameSite: 'none',
     },
     saveUninitialized: false,
-    //   store: redisStore,
+    store: redisStore,
     resave: false,
     rolling: true,
 };
-if (app.get('env') === 'production' && sessionOptions.cookie !== undefined) {
+if (validateEnv_1.default.NODE_ENV === 'production' && sessionOptions.cookie !== undefined) {
     app.set('trust proxy', 1); // trust first proxy
     sessionOptions.cookie.secure = true; // serve secure cookies
 }
+app.use((0, cors_1.default)({ origin: validateEnv_1.default.CLIENT_URL, credentials: true }));
 app.use((0, express_session_1.default)(sessionOptions));
 // parse application/x-www-form-urlencoded
 app.use(express_1.default.urlencoded({ extended: false }));

@@ -10,6 +10,7 @@ import { createClient } from 'redis';
 import createHttpError from 'http-errors';
 import env from './utils/validateEnv';
 import requiresAuth from './middlewares/auth';
+import cors from 'cors';
 
 const app: Express = express();
 
@@ -27,17 +28,21 @@ const sessionOptions: session.SessionOptions = {
     secret: env.SESSION_SECRET,
     cookie: {
         maxAge: 60 * 60 * 1000,
+        // cookie same site, comment this line if you are on the same site
+        sameSite: 'none',
     },
     saveUninitialized: false,
-    //   store: redisStore,
+    store: redisStore,
     resave: false,
     rolling: true,
 };
 
-if (app.get('env') === 'production' && sessionOptions.cookie !== undefined) {
+if (env.NODE_ENV === 'production' && sessionOptions.cookie !== undefined) {
     app.set('trust proxy', 1); // trust first proxy
     sessionOptions.cookie.secure = true; // serve secure cookies
 }
+
+app.use(cors({ origin: env.CLIENT_URL, credentials: true }));
 
 app.use(session(sessionOptions));
 

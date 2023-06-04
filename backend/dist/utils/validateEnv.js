@@ -10,4 +10,5 @@ exports.default = (0, envalid_1.cleanEnv)(process.env, {
     }),
     SESSION_SECRET: (0, validators_1.str)(),
     REDIS_URL: (0, validators_1.str)(),
+    CLIENT_URL: (0, validators_1.str)(),
 });
