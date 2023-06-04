@@ -28,15 +28,13 @@ const sessionOptions = {
     secret: validateEnv_1.default.SESSION_SECRET,
     cookie: {
         maxAge: 60 * 60 * 1000,
-        // cookie same site, comment this line if you are on the same site
-        sameSite: validateEnv_1.default.NODE_ENV === 'production' ? 'none' : false,
     },
     saveUninitialized: false,
-    store: redisStore,
+    //   store: redisStore,
     resave: false,
     rolling: true,
 };
-if (validateEnv_1.default.NODE_ENV === 'production' && sessionOptions.cookie !== undefined) {
+if (app.get('env') === 'production' && sessionOptions.cookie !== undefined) {
     app.set('trust proxy', 1); // trust first proxy
     sessionOptions.cookie.secure = true; // serve secure cookies
 }
@@ -50,9 +48,6 @@ app.use((0, morgan_1.default)('combined'));
 // config routes
 app.use('/api/notes', auth_1.default, notes_1.default);
 app.use('/api/auth', users_1.default);
-app.use('/', (req, res) => {
-    res.send('Welcome to note app server');
-});
 app.use((req, res, next) => {
     next((0, http_errors_1.default)(404, 'Endpoint not found'));
 });

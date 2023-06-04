@@ -20,26 +20,24 @@ redisClient.connect().catch(console.error);
 
 // Initialize store.
 const redisStore = new RedisStore({
-  client: redisClient,
-  prefix: 'note_app:',
+    client: redisClient,
+    prefix: 'note_app:',
 });
 
 const sessionOptions: session.SessionOptions = {
-  secret: env.SESSION_SECRET,
-  cookie: {
-    maxAge: 60 * 60 * 1000,
-    // cookie same site, comment this line if you are on the same site
-    sameSite: env.NODE_ENV === 'production' ? 'none' : false,
-  },
-  saveUninitialized: false,
-  store: redisStore,
-  resave: false,
-  rolling: true,
+    secret: env.SESSION_SECRET,
+    cookie: {
+        maxAge: 60 * 60 * 1000,
+    },
+    saveUninitialized: false,
+    //   store: redisStore,
+    resave: false,
+    rolling: true,
 };
 
-if (env.NODE_ENV === 'production' && sessionOptions.cookie !== undefined) {
-  app.set('trust proxy', 1); // trust first proxy
-  sessionOptions.cookie.secure = true; // serve secure cookies
+if (app.get('env') === 'production' && sessionOptions.cookie !== undefined) {
+    app.set('trust proxy', 1); // trust first proxy
+    sessionOptions.cookie.secure = true; // serve secure cookies
 }
 
 app.use(cors({ origin: env.CLIENT_URL, credentials: true }));
@@ -57,12 +55,9 @@ app.use(morgan('combined'));
 // config routes
 app.use('/api/notes', requiresAuth, noteRoutes);
 app.use('/api/auth', userRoutes);
-app.use('/', (req, res) => {
-  res.send('Welcome to note app server');
-});
 
 app.use((req, res, next) => {
-  next(createHttpError(404, 'Endpoint not found'));
+    next(createHttpError(404, 'Endpoint not found'));
 });
 
 // error middleware
