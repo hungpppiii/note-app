@@ -50,6 +50,9 @@ app.use(express.json());
 app.use(morgan('combined'));
 
 // config routes
+app.use('/', (req, res) => {
+    res.send('Welcome to note app server');
+});
 app.use('/api/notes', requiresAuth, noteRoutes);
 app.use('/api/auth', userRoutes);
 
