@@ -2,9 +2,13 @@ import { ConflictError, UnauthorizedError } from '../utils/http_errors';
 
 export const fetchData = async (
   input: RequestInfo,
-  init: RequestInit = { method: 'GET' }
+  init: RequestInit = { method: 'GET', credentials: 'include' }
 ) => {
-  const response = await fetch(input, init);
+  console.log('check', `${process.env.REACT_APP_API_URL}${input}`);
+  const response = await fetch(
+    `${process.env.REACT_APP_API_URL}${input}`,
+    init
+  );
   if (response.ok) {
     return response;
   } else {
