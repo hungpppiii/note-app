@@ -29,7 +29,7 @@ const sessionOptions: session.SessionOptions = {
     cookie: {
         maxAge: 60 * 60 * 1000,
         // cookie same site, comment this line if you are on the same site
-        sameSite: 'none',
+        sameSite: env.NODE_ENV === 'production' ? 'none' : false,
     },
     saveUninitialized: false,
     store: redisStore,
