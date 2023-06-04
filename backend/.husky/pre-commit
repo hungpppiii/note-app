@@ -2,4 +2,6 @@
 . "$(dirname -- "$0")/_/husky.sh"
 
 cd backend
+npm run build
 npm run format
+git add dist

@@ -9,4 +9,5 @@ export default cleanEnv(process.env, {
     }),
     SESSION_SECRET: str(),
     REDIS_URL: str(),
+    CLIENT_URL: str(),
 });
